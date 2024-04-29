@@ -37,8 +37,7 @@ const userSchema = new mongoose.Schema(
     ],
     profileImg: {
       type: String,
-      default:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRVf-Sm-F1X6m501mwE5VowNHE3wJJZEFLH2w&s",
+      default:"",
     },
     coverImg: {
       type: String,
@@ -52,6 +51,13 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    likedPosts: [
+        {
+          type:mongoose.Schema.Types.ObjectId,
+          ref:"Post",
+          default:[],
+        },
+    ], 
   },
   { timestamps: true }
 );
