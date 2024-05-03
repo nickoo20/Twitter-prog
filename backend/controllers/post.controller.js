@@ -43,7 +43,7 @@ export const createPost = async (req, res) => {
 
 export const deletePost = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.params.id) ;
     if (!post) {
       return res.status(404).json({
         error: "Post not found!",
@@ -90,7 +90,10 @@ export const commentOnPost = async (req, res) => {
       });
     }
 
-    const comment = { user: userId, text };
+    const comment = { 
+      user: userId, 
+      text 
+    };
     post.comments.push(comment);
     await post.save();
     return res.status(200).json(post);
@@ -114,10 +117,10 @@ export const likeUnlikePost = async (req, res) => {
       });
     }
 
-    const userLikedPost = post.likes.includes(userId);
+    const userLikedPost = post.likes.includes(userId) ;
     if (userLikedPost) {
       // unlike the post
-      await Post.updateOne({ _id: postId }, { $pull: { likes: userId } });
+      await Post.updateOne({ _id: postId }, { $pull: { likes: userId } }) ;
       await User.updateOne({ _id: userId }, { $pull: { likedPosts: postId } });
       return res.status(200).json({
         message: "Post unliked successfully!",
@@ -147,7 +150,6 @@ export const likeUnlikePost = async (req, res) => {
 };
 
 export const getAllPosts = async (req, res) => {
-  // User created Posts + user Following Posts
   try {
     const posts = await Post.find()
       .sort({ createdAt: -1 })

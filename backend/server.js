@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import authRoutes from "./routes/auth.route.js";
 import userRoutes from './routes/user.route.js' ; 
 import postRoutes from './routes/post.route.js';  
+import notificationRoutes from './routes/notification.route.js' ;
 import connectMongodb from "./db/connectMongodb.js";
 import cookieParser from "cookie-parser";
 import {v2 as cloudinary} from 'cloudinary' ;
@@ -15,25 +16,18 @@ cloudinary.config({
     api_secret:process.env.CLOUDINARY_API_SECRET,
 }) ;
 
-// mongoose.connect(process.env.MONGO_URI)
-// .then(() => {
-//         console.log('Mongoose Connected ! ')
-//     })
-//     .catch((err) => {
-//             console.log(err) ;
-//         });
-
-const app = express();
-const PORT = process.env.PORT || 5001;
+const app = express() ;
+const PORT = process.env.PORT || 5001 ;
 
 // console.log(process.env.MONGO_URI) ;
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(express.json()) ; 
+app.use(express.urlencoded({ extended: true })) ;
+app.use(cookieParser()) ; 
 
 app.use("/api/auth", authRoutes) ;
 app.use("/api/users", userRoutes) ;
 app.use("/api/posts", postRoutes) ;
+app.use("/api/notifications",notificationRoutes) ;
 // app.get('/', (req, res)=>{
 //     res.send("Server is ready!") ;
 // })
