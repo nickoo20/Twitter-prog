@@ -69,43 +69,37 @@ export const signup = async(req, res) => {
     }
 }
 
-export const login = async(req, res) => {
-   try{
-        const {username, password} = req.body ; 
-        const user = await User.findOne({username}) ;
-        const isPasswordCorrect = await bcrypt.compare(password, user?.password || "") ;
+export const login = async (req, res) => {
+	try {
+		const { username, password } = req.body;
+		const user = await User.findOne({username});
+		const isPasswordCorrect = await bcrypt.compare(password, user?.password || "") ;
+        
+		if (!isPasswordCorrect) {
+			return res.status(400).json({ error: "Invalid username or password" });
+		}
 
-        if(!user || !isPasswordCorrect){
-            return res.status(400).json({
-                error : "Invalid username or password!",
-            }) ;
-        }
-        generateTokenAndSetCookie(user._id, res) ;
-        // const users = await User.findOne({username}).select("-password") ;
-        // return res.status(200).json(users) ;
-         
-        return res.status(200).json({   
-            _id : user._id,
-            username: user.username,
-            email : user.email, 
-            fullName: user.fullName,
-            followers:user.followers,
-            following: user.following,
-            profileImg: user.profileImg,
-            coverImg: user.coverImg,
-        }) ;
+		generateTokenAndSetCookie(user._id, res);
 
-   }catch(error){
-        console.log(`Error in Login Controller, ${error.message}!`) ;
-        return res.status({
-            error: "Internal Server error",
-        }) ;
-   }
-}
+		res.status(200).json({
+			_id: user._id,
+			fullName: user.fullName,
+			username: user.username,
+			email: user.email,
+			followers: user.followers,
+			following: user.following,
+			profileImg: user.profileImg,
+			coverImg: user.coverImg,
+		});
+	} catch (error) {
+		console.log("Error in login controller", error.message);
+		res.status(500).json({ error: "Internal Server Error" });
+	}
+};
 
 export const logout = async(req, res) => {
     try{
-        res.cookie("jwt","") ;
+        res.cookie("jwt","",{ maxAge: 0 }) ;
         return res.status(200).json({
             message: "Logged Out successfully!",
         }) 
