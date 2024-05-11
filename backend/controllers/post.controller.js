@@ -43,7 +43,7 @@ export const createPost = async (req, res) => {
 
 export const deletePost = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id) ;
+    const post = await Post.findById(req.params.id);
     if (!post) {
       return res.status(404).json({
         error: "Post not found!",
@@ -90,9 +90,9 @@ export const commentOnPost = async (req, res) => {
       });
     }
 
-    const comment = { 
-      user: userId, 
-      text 
+    const comment = {
+      user: userId,
+      text,
     };
     post.comments.push(comment);
     await post.save();
@@ -117,14 +117,17 @@ export const likeUnlikePost = async (req, res) => {
       });
     }
 
-    const userLikedPost = post.likes.includes(userId) ;
+    const userLikedPost = post.likes.includes(userId);
     if (userLikedPost) {
       // unlike the post
-      await Post.updateOne({ _id: postId }, { $pull: { likes: userId } }) ;
+      await Post.updateOne({ _id: postId }, { $pull: { likes: userId } });
       await User.updateOne({ _id: userId }, { $pull: { likedPosts: postId } });
-      return res.status(200).json({
-        message: "Post unliked successfully!",
-      });
+
+      const updatedLikes = post.likes.filter(
+        (id) => id.toString() !== userId.toString()
+      );
+
+      return res.status(200).json(updatedLikes);
     } else {
       // like the post
       post.likes.push(userId);
@@ -137,9 +140,8 @@ export const likeUnlikePost = async (req, res) => {
         type: "like",
       });
       await notification.save();
-      return res.status(200).json({
-        message: "Post liked successfully!",
-      });
+      const updatedLikes = post.likes;
+      return res.status(200).json(updatedLikes);
     }
   } catch (error) {
     console.log(`Error in likeUnlikePost Controller, ${error.message}!`);
@@ -244,13 +246,13 @@ export const getFollowingPosts = async (req, res) => {
 
 export const getUserPosts = async (req, res) => {
   try {
-    const { username } = req.params ;
-    const user = await User.findOne({ username }) ;
+    const { username } = req.params;
+    const user = await User.findOne({ username });
 
     if (!user) {
       return res.status(400).json({
         error: "user not found",
-      }) ;
+      });
     }
 
     const posts = await Post.find({ user: user._id })
@@ -262,10 +264,9 @@ export const getUserPosts = async (req, res) => {
       .populate({
         path: "comments.user",
         select: "-password",
-      }) ;
+      });
 
-    return res.status(200).json(posts) ;
-
+    return res.status(200).json(posts);
   } catch (error) {
     console.log(`Error in getUserPosts controller, ${error.message}`);
     return res.status(500).json({
